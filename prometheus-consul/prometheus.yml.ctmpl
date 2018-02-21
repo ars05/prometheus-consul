@@ -35,7 +35,7 @@ scrape_configs:
   consul_sd_configs:
   - server: '%CONSUL_SERVER%'
     token: '%CONSUL_TOKEN%'
-    datacenter: 'skydc'
+    datacenter: 'DC'
     services:{{ $service_name := keyOrDefault $service_name "^consul" }} ['EMPTY', {{range services}}{{if .Name | regexMatch $service_name }}'{{ .Name }}',{{end}}{{end}}]
 
   relabel_configs:

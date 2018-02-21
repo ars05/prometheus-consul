@@ -12,9 +12,9 @@ To ease with migration this container includes a script at `/update-rules.sh` wh
 $ docker run -t --rm \
     -e KEY_PATH="some/keyvalue/path" \
     -e ALERT_KEY_PATH="some/keyvalue/path" \
-    -e CONSUL_SERVER="servicediscovery.ath.bskyb.com:8500" \
+    -e CONSUL_SERVER="servicediscovery.com:8500" \
     -e CONSUL_TOKEN="xxxxxx-xxxxxx-xxxxx-xxxxxx" \
-    artifacts.ath.bskyb.com:5003/cd-devops/prometheus-consul \
+    artifacts.com:5003/cd-devops/prometheus-consul \
     /update-rules.sh
 groups:
 - name: /etc/prometheus/alert.rules
@@ -33,7 +33,7 @@ Alternatively, if you wish to do this manually you can follow this guide: https:
 |------------------|---------|--------------------------------------------------------------------------------------------------|----------|
 | KEY_PATH         |         | The Consul path to use for configuration of Prometheus                                           | ✓        |
 | ALERT_KEY_PATH   |         | The Consul path to look under for configuration of alerts                                               | ✓        |
-| CONSUL_SERVER    |         | The Consul server to use for configuration. e.g. `servicediscovery.[ath,slu,hhe].bskyb.com:8500` | ✓        |
+| CONSUL_SERVER    |         | The Consul server to use for configuration. e.g. `servicediscovery.com:8500` | ✓        |
 | CONSUL_TOKEN     |         | The Consul token to use to read the configuration                                                | ✓        |
 | RETENTION_PERIOD |         | How long should prometheus store metrics for                                                     |          |
 | WEB_HOSTNAME     |         | The external hostname used to access Prometheus                                                  |          |
@@ -47,12 +47,12 @@ docker run -d \
     -p 9090:9090 \
     -e KEY_PATH="some/keyvalue/path" \
     -e ALERT_KEY_PATH="some/keyvalue/path" \
-    -e CONSUL_SERVER="servicediscovery.ath.bskyb.com:8500" \
+    -e CONSUL_SERVER="servicediscovery.com:8500" \
     -e CONSUL_TOKEN="xxxxxx-xxxxxx-xxxxx-xxxxxx" \
     -e RETENTION_PERIOD=720h \
     -e WEB_HOSTNAME="box1.host" \
     -e ALERTMANAGERS="alertmanager1.host:9093,alertmanager2.host:9093" \
-    artifacts.ath.bskyb.com:5003/cd-devops/prometheus-consul
+    artifacts.com:5003/cd-devops/prometheus-consul
 ```
 
 ## Configuration
@@ -72,8 +72,8 @@ Consultemplate expects the configuration to be stored using the below keys, `KEY
 
 ## Building
 
-Generates a version ID in the format `artifacts.ath.bskyb.com:5001/cd-devops/prometheus-consul:1.8.0-20171009-1501`, where the date is recovered from the last commit, the current date will be used if there are uncommitted changes.
+Generates a version ID in the format `artifacts.com:5001/cd-devops/prometheus-consul:1.8.0-20171009-1501`, where the date is recovered from the last commit, the current date will be used if there are uncommitted changes.
 
 ```shell
-docker build --squash --build-arg COMMIT_ID=$(git rev-parse --short HEAD) -t artifacts.ath.bskyb.com:5001/cd-devops/prometheus-consul:$(cat VERSION)-$(./generate-version-date.sh) .
+docker build --squash --build-arg COMMIT_ID=$(git rev-parse --short HEAD) -t artifacts.com:5001/cd-devops/prometheus-consul:$(cat VERSION)-$(./generate-version-date.sh) .
 ```
