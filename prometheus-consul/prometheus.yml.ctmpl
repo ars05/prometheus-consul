@@ -1,0 +1,57 @@
+global:
+  scrape_interval:     15s # default: 15s
+  evaluation_interval: 15s # default: 15s
+
+rule_files:
+  - "alert.rules"
+
+{{- if (env "ALERTMANAGERS") }}
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+    {{- range (split "," (env "ALERTMANAGERS"))}}
+      - "{{ . }}"
+    {{- end}}
+{{- end}}
+
+scrape_configs:
+{{ range ls "%KEY_PATH%" }}
+{{- $service_name := (print "%KEY_PATH%" .Key) }}
+{{- range ls $service_name }}
+{{- $job_name := (print .Key)}}
+{{- if $job_name | regexMatch "job_name" }}
+- job_name: {{ .Value }}
+{{- else }}
+  {{ .Key }}: {{ .Value }}
+{{- end }}
+{{- end }}
+{{- $parameters := (print $service_name "/job_name" )}}
+{{- range ls $parameters }}
+  {{ .Key }}: {{ .Value }}
+{{- end }}
+
+  consul_sd_configs:
+  - server: '%CONSUL_SERVER%'
+    token: '%CONSUL_TOKEN%'
+    datacenter: 'skydc'
+    services:{{ $service_name := keyOrDefault $service_name "^consul" }} ['EMPTY', {{range services}}{{if .Name | regexMatch $service_name }}'{{ .Name }}',{{end}}{{end}}]
+
+  relabel_configs:
+  - source_labels: ['__meta_consul_service']
+    regex:         '(.*)'
+    target_label:  'consul_service'
+    replacement:   '$1'
+
+  - source_labels: ['__meta_consul_service_address']
+    regex:         '(.*)'
+    target_label:  'service_address_ip'
+    replacement:   '$1'
+
+  - source_labels: ['__meta_consul_tags']
+    regex:         ',(.*),'
+    target_label:  'tags'
+    replacement:   '$1'
+
+{{ end }}
